@@ -3,68 +3,46 @@ package ru.hogwarts.school.service;
 import org.springframework.stereotype.Service;
 import ru.hogwarts.school.exception.NotFoundException;
 import ru.hogwarts.school.model.Student;
+import ru.hogwarts.school.repository.StudentRepository;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class StudentServiceImpl implements StudentService {
 
-    private final Map<Long, Student> repositoryStudents = new HashMap<>();
-    private Long counter = 0L;
+    private final StudentRepository studentRepository;
+
+    public StudentServiceImpl(StudentRepository studentRepository) {
+        this.studentRepository = studentRepository;
+    }
 
     @Override
     public Student addStudent(Student student) {
-        student.setId(++counter);
-        return repositoryStudents.put(counter, student);
+        return studentRepository.save(student);
     }
 
     @Override
     public Student findStudent(Long id) {
-        validataId(id);
-        return repositoryStudents.get(id);
+        return studentRepository.findById(id).get();
     }
 
     @Override
     public List<Student> getAllStudents() {
-        return new ArrayList<>(repositoryStudents.values());
+        return studentRepository.findAll();
     }
 
     @Override
     public List<Student> getStudentsByAge(int age) {
-        validataAge(age);
-        return repositoryStudents.entrySet().stream()
-                .filter(x -> x.getValue().getAge() == age)
-                .map(Map.Entry::getValue)
-                .collect(Collectors.toList());
+        return studentRepository.findByAge(age);
     }
 
     @Override
-    public Student changeStudent(Long id, Student student) {
-        validataId(id);
-        student.setId(id);
-        return repositoryStudents.put(id, student);
+    public Student changeStudent(Student student) {
+        return studentRepository.save(student);
     }
 
     @Override
-    public Student deleteStudent(Long id) {
-        validataId(id);
-        return repositoryStudents.remove(id);
-    }
-
-    private void validataId(Long id) {
-        if (!repositoryStudents.containsKey(id)) {
-            throw new NotFoundException("Студента с id = " + " не существует");
-        }
-    }
-
-    private void validataAge(int age) {
-        if (age < 0) {
-            throw new IllegalArgumentException();
-        }
-        if (!repositoryStudents.entrySet().stream()
-                .anyMatch(x -> x.getValue().getAge() == age)) {
-            throw new NotFoundException("Студента с возрастом = " + " не существует");
-        }
+    public void deleteStudent(Long id) {
+        studentRepository.deleteById(id);
     }
 }

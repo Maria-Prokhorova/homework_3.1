@@ -14,7 +14,7 @@ public interface FacultyService {
 
     List<Faculty> getFacultiesByColor(String color);
 
-    Faculty changeFaculty(Long id, Faculty faculty);
+   // Faculty changeFaculty(Long id, Faculty faculty);
 
-    Faculty deleteFaculty(Long id);
+    void deleteFaculty(Long id);
 }

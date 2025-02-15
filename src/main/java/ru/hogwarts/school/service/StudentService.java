@@ -5,6 +5,7 @@ import ru.hogwarts.school.model.Student;
 import java.util.List;
 
 public interface StudentService {
+
     Student addStudent(Student student);
 
     Student findStudent(Long id);
@@ -13,7 +14,7 @@ public interface StudentService {
 
     List<Student> getStudentsByAge(int age);
 
-    Student changeStudent(Long id, Student student);
+    Student changeStudent(Student student);
 
-    Student deleteStudent(Long id);
+    void deleteStudent(Long id);
 }
