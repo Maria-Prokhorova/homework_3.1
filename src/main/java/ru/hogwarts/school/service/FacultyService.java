@@ -8,13 +8,13 @@ public interface FacultyService {
 
     Faculty addFaculty(Faculty faculty);
 
-    Faculty findFaculty(Long id);
+    Faculty findFaculty(long id);
 
     List<Faculty> getAllFaculties();
 
     List<Faculty> getFacultiesByColor(String color);
 
-   // Faculty changeFaculty(Long id, Faculty faculty);
+    Faculty changeFaculty(Faculty faculty);
 
-    void deleteFaculty(Long id);
+    void deleteFaculty(long id);
 }

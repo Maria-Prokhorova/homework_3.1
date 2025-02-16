@@ -26,8 +26,8 @@ public class FacultyServiceImpl implements FacultyService {
     }
 
     @Override
-    public Faculty findFaculty(Long id) {
-       // validateId(id);
+    public Faculty findFaculty(long id) {
+        validateId(id);
         return facultyRepository.findById(id).get();
     }
 
@@ -38,25 +38,23 @@ public class FacultyServiceImpl implements FacultyService {
 
     @Override
     public List<Faculty> getFacultiesByColor(String color) {
-       // validateColor(color);
+        validateColor(color);
         return facultyRepository.findByColor(color);
     }
 
-   /* @Override
-    public Faculty changeFaculty(Long id, Faculty faculty) {
-       // validateId(id);
-        faculty.setId(id);
-        return repositoryFaculties.put(id, faculty);
-    }*/
+    @Override
+    public Faculty changeFaculty(Faculty faculty) {
+        return facultyRepository.save(faculty);
+    }
 
     @Override
-    public void deleteFaculty(Long id) {
-       // validateId(id);
+    public void deleteFaculty(long id) {
+        validateId(id);
         facultyRepository.deleteById(id);
     }
 
-    /*private void validateId(Long id) {
-        if (!repositoryFaculties.containsKey(id)) {
+    private void validateId(long id) {
+        if (facultyRepository.findById(id).isEmpty()) {
             throw new NotFoundException("Факультета с id = " + id + " не существует");
         }
     }
@@ -65,9 +63,8 @@ public class FacultyServiceImpl implements FacultyService {
         if (color == null && color.isBlank()) {
             throw new IllegalArgumentException();
         }
-        if (!repositoryFaculties.entrySet().stream()
-                .anyMatch(x -> x.getValue().getColor().equals(color))) {
-            throw new NotFoundException("Факультета с цветом - " + " не существует");
+        if (facultyRepository.findByColor(color).isEmpty()) {
+            throw new NotFoundException("Факультета с цветом - " + color + " не существует");
         }
-    }*/
+    }
 }

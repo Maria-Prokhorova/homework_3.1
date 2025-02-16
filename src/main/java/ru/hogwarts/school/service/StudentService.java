@@ -8,7 +8,7 @@ public interface StudentService {
 
     Student addStudent(Student student);
 
-    Student findStudent(Long id);
+    Student findStudent(long id);
 
     List<Student> getAllStudents();
 
@@ -16,5 +16,5 @@ public interface StudentService {
 
     Student changeStudent(Student student);
 
-    void deleteStudent(Long id);
+    void deleteStudent(long id);
 }

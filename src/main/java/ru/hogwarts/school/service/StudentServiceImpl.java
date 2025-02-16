@@ -22,7 +22,8 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    public Student findStudent(Long id) {
+    public Student findStudent(long id) {
+        validateId(id);
         return studentRepository.findById(id).get();
     }
 
@@ -33,6 +34,7 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     public List<Student> getStudentsByAge(int age) {
+        validateAge(age);
         return studentRepository.findByAge(age);
     }
 
@@ -42,7 +44,20 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    public void deleteStudent(Long id) {
+    public void deleteStudent(long id) {
+        validateId(id);
         studentRepository.deleteById(id);
+    }
+
+    private void validateId(long id) {
+        if (studentRepository.findById(id).isEmpty()) {
+            throw new NotFoundException("Студент с id = " + id + " не существует");
+        }
+    }
+
+    private void validateAge(int age) {
+        if (studentRepository.findByAge(age).isEmpty()) {
+            throw new NotFoundException("Студента с возрастом - " + age + " не существует");
+        }
     }
 }
