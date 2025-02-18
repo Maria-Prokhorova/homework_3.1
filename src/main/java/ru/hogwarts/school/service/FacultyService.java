@@ -17,4 +17,6 @@ public interface FacultyService {
     Faculty changeFaculty(Faculty faculty);
 
     void deleteFaculty(long id);
+
+    Faculty findFacultyByColorOrName(String color, String name);
 }
