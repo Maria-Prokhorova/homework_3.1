@@ -3,6 +3,7 @@ package ru.hogwarts.school.service;
 import org.springframework.stereotype.Service;
 import ru.hogwarts.school.exception.NotFoundException;
 import ru.hogwarts.school.model.Faculty;
+import ru.hogwarts.school.repository.FacultyRepository;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,61 +14,57 @@ import java.util.stream.Collectors;
 @Service
 public class FacultyServiceImpl implements FacultyService {
 
-    private final Map<Long, Faculty> repositoryFaculties = new HashMap<>();
-    private Long counter = 0L;
+    private final FacultyRepository facultyRepository;
 
-    @Override
-    public Faculty addFaculty(Faculty faculty) {
-        faculty.setId(++counter);
-        return repositoryFaculties.put(counter, faculty);
+    public FacultyServiceImpl(FacultyRepository facultyRepository) {
+        this.facultyRepository = facultyRepository;
     }
 
     @Override
-    public Faculty findFaculty(Long id) {
-        validataId(id);
-        return repositoryFaculties.get(id);
+    public Faculty addFaculty(Faculty faculty) {
+        return facultyRepository.save(faculty);
+    }
+
+    @Override
+    public Faculty findFaculty(long id) {
+        validateId(id);
+        return facultyRepository.findById(id).get();
     }
 
     @Override
     public List<Faculty> getAllFaculties() {
-        return new ArrayList<>(repositoryFaculties.values());
+        return facultyRepository.findAll();
     }
 
     @Override
     public List<Faculty> getFacultiesByColor(String color) {
-        validataColor(color);
-        return repositoryFaculties.entrySet().stream()
-                .filter(x -> x.getValue().getColor().equals(color))
-                .map(Map.Entry::getValue)
-                .collect(Collectors.toList());
+        validateColor(color);
+        return facultyRepository.findByColor(color);
     }
 
     @Override
-    public Faculty changeFaculty(Long id, Faculty faculty) {
-        validataId(id);
-        faculty.setId(id);
-        return repositoryFaculties.put(id, faculty);
+    public Faculty changeFaculty(Faculty faculty) {
+        return facultyRepository.save(faculty);
     }
 
     @Override
-    public Faculty deleteFaculty(Long id) {
-        validataId(id);
-        return repositoryFaculties.remove(id);
+    public void deleteFaculty(long id) {
+        validateId(id);
+        facultyRepository.deleteById(id);
     }
 
-    private void validataId(Long id) {
-        if (!repositoryFaculties.containsKey(id)) {
+    private void validateId(long id) {
+        if (facultyRepository.findById(id).isEmpty()) {
             throw new NotFoundException("Факультета с id = " + id + " не существует");
         }
     }
 
-    private void validataColor(String color) {
+    private void validateColor(String color) {
         if (color == null && color.isBlank()) {
             throw new IllegalArgumentException();
         }
-        if (!repositoryFaculties.entrySet().stream()
-                .anyMatch(x -> x.getValue().getColor().equals(color))) {
-            throw new NotFoundException("Факультета с цветом - " + " не существует");
+        if (facultyRepository.findByColor(color).isEmpty()) {
+            throw new NotFoundException("Факультета с цветом - " + color + " не существует");
         }
     }
 }
