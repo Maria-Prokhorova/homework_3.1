@@ -72,11 +72,16 @@ public class StudentServiceImplTest {
 
     @ParameterizedTest
     @MethodSource("provideCorrectQuestionForTests")
-    void testDeleteStudent(Student student, long correctId, long notCorrectId) {
+    void testDeleteStudentWhenException(Student student, long correctId, long notCorrectId) {
         assertThrows(NotFoundException.class, () -> out.deleteStudent(correctId));
+    }
 
-        //out.deleteStudent(correctId);
-        // verify(repositoryMock).deleteById(correctId);
+    @ParameterizedTest
+    @MethodSource("provideCorrectQuestionForTests")
+    void testDeleteStudent(Student student, long correctId, long notCorrectId) {
+        when(repositoryMock.findById(correctId)).thenReturn(Optional.ofNullable(student));
+        out.deleteStudent(correctId);
+        verify(repositoryMock).deleteById(correctId);
     }
 
     public static Stream<Arguments> provideCorrectQuestionForTests() {
@@ -103,6 +108,7 @@ public class StudentServiceImplTest {
                         new Student(12, "Vladimir", 20))))
         );
     }
+
     public static Stream<Arguments> provideCorrectQuestionForTests2() {
         return Stream.of(
                 Arguments.of(new ArrayList<>(List.of(
