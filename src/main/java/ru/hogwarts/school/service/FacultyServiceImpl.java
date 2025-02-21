@@ -53,6 +53,11 @@ public class FacultyServiceImpl implements FacultyService {
         facultyRepository.deleteById(id);
     }
 
+    @Override
+    public Faculty findFacultyByColorOrName(String color, String name) {
+       return facultyRepository.findByColorIgnoreCaseOrNameContainsIgnoreCase(color, name);
+    }
+
     private void validateId(long id) {
         if (facultyRepository.findById(id).isEmpty()) {
             throw new NotFoundException("Факультета с id = " + id + " не существует");

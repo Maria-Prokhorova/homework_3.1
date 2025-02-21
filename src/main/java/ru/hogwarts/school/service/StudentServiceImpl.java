@@ -49,6 +49,11 @@ public class StudentServiceImpl implements StudentService {
         studentRepository.deleteById(id);
     }
 
+    @Override
+    public List<Student> findStudentsByAgeBetween(int minAge, int maxAge) {
+        return studentRepository.findByAgeBetween(minAge, maxAge);
+    }
+
     private void validateId(long id) {
         if (studentRepository.findById(id).isEmpty()) {
             throw new NotFoundException("Студент с id = " + id + " не существует");
