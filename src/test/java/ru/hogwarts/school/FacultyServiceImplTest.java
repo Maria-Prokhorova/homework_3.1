@@ -19,6 +19,7 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -71,11 +72,17 @@ public class FacultyServiceImplTest {
 
     @ParameterizedTest
     @MethodSource("provideCorrectQuestionForTests1")
-    void testDeleteFaculty(Faculty faculty, long correctId, long notCorrectId) {
+    void testDeleteFacultyWhenException(Faculty faculty, long correctId, long notCorrectId) {
         assertThrows(NotFoundException.class, () -> out.deleteFaculty(correctId));
+    }
 
-        //out.deleteStudent(correctId);
-        // verify(repositoryMock).deleteById(correctId);
+    @ParameterizedTest
+    @MethodSource("provideCorrectQuestionForTests1")
+    void testDeleteFaculty(Faculty faculty, long correctId, long notCorrectId) {
+        when(repositoryMock.findById(correctId)).thenReturn(Optional.ofNullable(faculty));
+
+        out.deleteFaculty(correctId);
+        verify(repositoryMock).deleteById(correctId);
     }
 
     public static Stream<Arguments> provideCorrectQuestionForTests1() {
@@ -85,6 +92,7 @@ public class FacultyServiceImplTest {
                 Arguments.of(new Faculty(3, "Alex", "white"), 3, 30)
         );
     }
+
     public static Stream<Arguments> provideCorrectQuestionForTests2() {
         return Stream.of(
                 Arguments.of(new ArrayList<>(List.of(
