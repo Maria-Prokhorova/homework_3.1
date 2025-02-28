@@ -1,6 +1,8 @@
 package ru.hogwarts.school.model;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.Arrays;
 import java.util.Objects;
@@ -19,7 +21,8 @@ public class Avatar {
     @Lob
     private byte[] data;
 
-    @OneToOne
+    @OneToOne (cascade = CascadeType.ALL)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Student student;
 
     public Long getId() {

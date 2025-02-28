@@ -27,18 +27,18 @@ public class AvatarController {
         this.avatarService = avatarService;
     }
 
-    @PostMapping(value = "/id-student/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> uploadAvatar( @RequestParam Long idStudent, @RequestParam MultipartFile file) throws IOException {
+    @PostMapping(value = "/{id}/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<String> uploadAvatar(@PathVariable Long id, @RequestParam MultipartFile file) throws IOException {
         if (file.getSize() > 1024 * 300) {
             return ResponseEntity.badRequest().body("File is too big");
         }
-        avatarService.uploadAvatar(idStudent, file);
+        avatarService.uploadAvatar(id, file);
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/{id-student}/avatar/preview")
-    public ResponseEntity<byte[]> downloadAvatar(@PathVariable Long idStudent) {
-        Avatar avatar = avatarService.findStudentAvatar(idStudent);
+    @GetMapping("/{id}/avatar/preview")
+    public ResponseEntity<byte[]> downloadAvatar(@PathVariable Long id) {
+        Avatar avatar = avatarService.findStudentAvatar(id);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.parseMediaType(avatar.getMediaType()));
@@ -47,9 +47,9 @@ public class AvatarController {
         return ResponseEntity.status(HttpStatus.OK).headers(headers).body(avatar.getData());
     }
 
-    @GetMapping("/{id-student}/avatar")
-    public void downloadAvatar(@PathVariable Long idStudent, HttpServletResponse response) throws IOException {
-        Avatar avatar = avatarService.findStudentAvatar(idStudent);
+    @GetMapping("/{id}/avatar")
+    public void downloadAvatar(@PathVariable Long id, HttpServletResponse response) throws IOException {
+        Avatar avatar = avatarService.findStudentAvatar(id);
 
         Path path = Path.of(avatar.getFilePath());
 
