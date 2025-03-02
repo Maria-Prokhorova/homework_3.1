@@ -44,4 +44,14 @@ public class StudentControllerTests {
                 .isNotNull();
     }
 
+  /*  @Test
+    void testCreateStudent() {
+        Student student = new Student(1L, "Harry", 15);
+        String url = BASE_URL + port + "/student";
+
+        ResponseEntity<String> response = this.restTemplate.postForEntity(url, student, String.class);
+
+        Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        Assertions.assertThat(response.getBody()).isNotNull();*/
+
 }
