@@ -40,6 +40,8 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     public Student changeStudent(Student student) {
+        long id = student.getId();
+        validateId(id);
         return studentRepository.save(student);
     }
 
@@ -51,6 +53,7 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     public List<Student> findStudentsByAgeBetween(int minAge, int maxAge) {
+        validateMinMaxAge(minAge, maxAge);
         return studentRepository.findByAgeBetween(minAge, maxAge);
     }
 
@@ -65,4 +68,15 @@ public class StudentServiceImpl implements StudentService {
             throw new NotFoundException("Студента с возрастом - " + age + " не существует");
         }
     }
+
+    private void validateMinMaxAge(int minAge, int maxAge) {
+        int min = studentRepository.findMinAge();
+        int max = studentRepository.findMaxAge();
+
+        if ((minAge < min && maxAge < min) || (minAge > max && maxAge > max)) {
+            throw new NotFoundException("Неверно задан возрастной диапазон. Студентов с возрастом между "
+                    + minAge + " и " + maxAge + " в базе не существует");
+        }
+    }
+
 }
