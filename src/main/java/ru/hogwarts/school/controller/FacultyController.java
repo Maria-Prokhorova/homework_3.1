@@ -44,7 +44,7 @@ public class FacultyController {
     }
 
     @GetMapping("/idFaculty-by-students")
-    public Collection<Student> getStudentsByFacultyId(@RequestParam long facultyId) {
+    public Collection<Student> getStudentsByFacultyId(@RequestParam (name = "id") long facultyId) {
         return facultyService.findFaculty(facultyId).getStudents();
     }
 

@@ -8,14 +8,14 @@ import java.util.Objects;
 public class Student {
 
     @Id
-    @GeneratedValue (strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     private String name;
     private int age;
 
     @ManyToOne
-    @JoinColumn (name = "faculty_id")
+    @JoinColumn(name = "faculty_id")
     private Faculty faculty;
 
     public Student() {
@@ -55,6 +55,10 @@ public class Student {
         return faculty;
     }
 
+    public void setFaculty(Faculty faculty) {
+        this.faculty = faculty;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -74,7 +78,7 @@ public class Student {
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", age=" + age +
-                ", faculty=" + faculty.getName() + faculty.getColor()+
+                ", faculty=" + faculty +
                 '}';
     }
 }
