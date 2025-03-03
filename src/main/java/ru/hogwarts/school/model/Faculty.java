@@ -21,7 +21,6 @@ public class Faculty {
     @JsonIgnore
     private Collection<Student> students;
 
-
     public Faculty() {
     }
 

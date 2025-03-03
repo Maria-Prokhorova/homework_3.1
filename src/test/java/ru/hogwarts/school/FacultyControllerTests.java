@@ -6,14 +6,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.*;
 import ru.hogwarts.school.controller.FacultyController;
+import ru.hogwarts.school.controller.StudentController;
 import ru.hogwarts.school.model.Faculty;
+import ru.hogwarts.school.model.Student;
+
+import java.util.List;
 
 import static java.util.Objects.requireNonNull;
+import static org.springframework.http.HttpMethod.GET;
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -24,6 +27,9 @@ public class FacultyControllerTests {
 
     @Autowired
     private FacultyController facultyController;
+
+    @Autowired
+    private StudentController studentController;
 
     @Autowired
     private TestRestTemplate restTemplate;
@@ -41,8 +47,8 @@ public class FacultyControllerTests {
         ResponseEntity<Faculty> response = restTemplate.postForEntity("http://localhost:" + port + "/faculty", faculty, Faculty.class);
         Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         Assertions.assertThat(response.getBody().getId()).isNotNull();
-        Assertions.assertThat(response.getBody().getName()).isEqualTo("math");
-        Assertions.assertThat(response.getBody().getColor()).isEqualTo("green");
+        Assertions.assertThat(response.getBody().getName()).isEqualTo(faculty.getName());
+        Assertions.assertThat(response.getBody().getColor()).isEqualTo(faculty.getColor());
     }
 
     @Test
@@ -52,12 +58,12 @@ public class FacultyControllerTests {
         faculty.setColor("red");
         ResponseEntity<Faculty> responseAddFaculty = restTemplate.postForEntity("http://localhost:" + port + "/faculty", faculty, Faculty.class);
         Assertions.assertThat(responseAddFaculty.getStatusCode()).isEqualTo(HttpStatus.OK);
-        int id = (int) responseAddFaculty.getBody().getId();
+        long id = requireNonNull(responseAddFaculty.getBody()).getId();
 
         ResponseEntity<Faculty> responseGetFaculty = restTemplate.getForEntity("http://localhost:" + port + "/faculty/{id}", Faculty.class, id);
         Assertions.assertThat(responseGetFaculty.getStatusCode()).isEqualTo(HttpStatus.OK);
-        Assertions.assertThat(responseGetFaculty.getBody().getName()).isEqualTo("law");
-        Assertions.assertThat(responseGetFaculty.getBody().getColor()).isEqualTo("red");
+        Assertions.assertThat(responseGetFaculty.getBody().getName()).isEqualTo(faculty.getName());
+        Assertions.assertThat(responseGetFaculty.getBody().getColor()).isEqualTo(faculty.getColor());
     }
 
     @Test
@@ -70,38 +76,53 @@ public class FacultyControllerTests {
     @Test
     public void whenGetByColorFaculty_thenStatusOk() {
         Faculty faculty = new Faculty();
-        faculty.setName("law1");
-        faculty.setColor("red1");
-        ResponseEntity<Faculty> responseAddFaculty = restTemplate.postForEntity("http://localhost:" + port + "/faculty", faculty, Faculty.class);
-        ResponseEntity<String> response = restTemplate.getForEntity("http://localhost:" + port + "/faculty/color?color=" + faculty.getColor(), String.class);
+        faculty.setName("biology");
+        faculty.setColor("blue");
+        ResponseEntity<Faculty> responseAddFaculty = restTemplate.postForEntity("http://localhost:"
+                + port + "/faculty", faculty, Faculty.class);
+        ResponseEntity<String> response = restTemplate.getForEntity("http://localhost:"
+                + port + "/faculty/color?color=" + faculty.getColor(), String.class);
         Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
 
     @Test
     public void whenGetByColorFaculty_thenStatusNotFound() {
         String color = "22222";
-        ResponseEntity<String> response = restTemplate.getForEntity("http://localhost:" + port + "/faculty/color?color=" + color, String.class);
+        ResponseEntity<String> response = restTemplate.getForEntity("http://localhost:"
+                + port + "/faculty/color?color=" + color, String.class);
         Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
 
     @Test
     public void whenGetByColorOrNameFaculty_thenStatusOk() {
         Faculty faculty = new Faculty();
-        faculty.setName("111111");
-        faculty.setColor("111111");
-        ResponseEntity<Faculty> responseAddFaculty = restTemplate.postForEntity("http://localhost:" + port + "/faculty", faculty, Faculty.class);
+        faculty.setName("writer");
+        faculty.setColor("violet");
+        ResponseEntity<Faculty> responseAddFaculty = restTemplate.postForEntity("http://localhost:"
+                + port + "/faculty", faculty, Faculty.class);
         String color = (String) responseAddFaculty.getBody().getColor();
         String name = (String) responseAddFaculty.getBody().getName();
 
-        ResponseEntity<Faculty> responseGetFacultyByColor = restTemplate.getForEntity("http://localhost:" + port + "/faculty/colorOrName?color=" + color, Faculty.class);
+        // указали название факультета
+        ResponseEntity<Faculty> responseGetFacultyByName = restTemplate.getForEntity("http://localhost:"
+                + port + "/faculty/colorOrName?name=" + name, Faculty.class);
+        Assertions.assertThat(responseGetFacultyByName.getStatusCode()).isEqualTo(HttpStatus.OK);
+        Assertions.assertThat(responseGetFacultyByName.getBody().getName()).isEqualTo(faculty.getName());
+        Assertions.assertThat(responseGetFacultyByName.getBody().getColor()).isEqualTo(faculty.getColor());
+
+        // указали цвет факультета
+        ResponseEntity<Faculty> responseGetFacultyByColor = restTemplate.getForEntity("http://localhost:"
+                + port + "/faculty/colorOrName?color=" + color, Faculty.class);
         Assertions.assertThat(responseGetFacultyByColor.getStatusCode()).isEqualTo(HttpStatus.OK);
         Assertions.assertThat(responseGetFacultyByColor.getBody().getName()).isEqualTo(faculty.getName());
         Assertions.assertThat(responseGetFacultyByColor.getBody().getColor()).isEqualTo(faculty.getColor());
 
-        ResponseEntity<Faculty> responseGetFacultyByName = restTemplate.getForEntity("http://localhost:" + port + "/faculty/colorOrName?name=" + name, Faculty.class);
-        Assertions.assertThat(responseGetFacultyByName.getStatusCode()).isEqualTo(HttpStatus.OK);
-        Assertions.assertThat(responseGetFacultyByName.getBody().getName()).isEqualTo(faculty.getName());
-        Assertions.assertThat(responseGetFacultyByName.getBody().getColor()).isEqualTo(faculty.getColor());
+        // указали название и цвет факультета
+        ResponseEntity<Faculty> responseGetFacultyByNameAndColor = restTemplate.getForEntity("http://localhost:"
+                + port + "/faculty/colorOrName?name=" + name + "&color=" + color, Faculty.class);
+        Assertions.assertThat(responseGetFacultyByNameAndColor.getStatusCode()).isEqualTo(HttpStatus.OK);
+        Assertions.assertThat(responseGetFacultyByNameAndColor.getBody().getName()).isEqualTo(faculty.getName());
+        Assertions.assertThat(responseGetFacultyByNameAndColor.getBody().getColor()).isEqualTo(faculty.getColor());
     }
 
     @Test
@@ -131,62 +152,91 @@ public class FacultyControllerTests {
     }
 
     @Test
-    public void testGetFaculty() {
-       Assertions
-                .assertThat(this.restTemplate.getForObject("http://localhost:" + port + "/faculty", String.class))
-                .isNotEmpty();
+    public void whenGetAllFaculties() {
+
+        ResponseEntity<List<Faculty>> response = restTemplate.exchange("http://localhost:" + port + "/faculty", GET, null,
+                new ParameterizedTypeReference<List<Faculty>>() {
+                });
+        Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        Assertions.assertThat(response.getBody().size()).isNotNull();
     }
 
     @Test
-    public void testGetStudentsByFacultyId() {
-        Assertions
-                .assertThat(this.restTemplate.getForObject("http://localhost:" + port + "/faculty/idFaculty-by-students", String.class))
-                .isNotEmpty();
+    public void whenGetStudentsByFacultyId_thenStatusOk() {
+        Faculty faculty1 = facultyController.addFaculty(new Faculty(0L, "Griffindor", "green"));
+        Faculty faculty2 = facultyController.addFaculty(new Faculty(0L, "Slytherin", "blue"));
+        Faculty faculty3 = facultyController.addFaculty(new Faculty(0L, "Hufflepuff", "red"));
+        Student student1 = studentController.addStudent(new Student(0L, "Harry", 15));
+        student1.setFaculty(faculty1);
+        studentController.changeStudent(student1);
+        Student student2 = studentController.addStudent(new Student(0L, "Malfoi", 15));
+        student2.setFaculty(faculty2);
+        studentController.changeStudent(student2);
+        Student student3 = studentController.addStudent(new Student(0L, "Ron", 15));
+        student3.setFaculty(faculty1);
+        studentController.changeStudent(student3);
+
+        ResponseEntity<List<Student>> response = restTemplate.exchange("http://localhost:"
+                        + port + "/faculty/idFaculty-by-students?id=" + faculty1.getId(), GET, null,
+                new ParameterizedTypeReference<>() {
+                });
+        Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        Assertions.assertThat(response.getBody()).isNotNull();
+        Assertions.assertThat(response.getBody().contains(student1)).isTrue();
+    }
+
+    @Test
+    public void whenGetStudentsByFacultyId_thenStatusNotFound() {
+        ResponseEntity<String> response = restTemplate.exchange("http://localhost:"
+                        + port + "/faculty/idFaculty-by-students?id=" + 1000, GET, null,
+                new ParameterizedTypeReference<>() {
+                });
+        Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
 
     @Test
     public void whenPutFaculty_thenStatusOk() {
         Faculty facultyForAdd = new Faculty();
-        facultyForAdd.setName("math");
-        facultyForAdd.setColor("red");
+        facultyForAdd.setName("ecwgtewcec");
+        facultyForAdd.setColor("yellow");
         ResponseEntity<Faculty> responseAddFaculty = restTemplate.postForEntity("http://localhost:" + port + "/faculty", facultyForAdd, Faculty.class);
-        int id = (int) responseAddFaculty.getBody().getId();
+        long id = requireNonNull(responseAddFaculty.getBody()).getId();
 
         Faculty facultyForChange = new Faculty();
         facultyForChange.setId(id);
-        facultyForChange.setName("rush");
-        facultyForChange.setColor("black");
-        ResponseEntity response = restTemplate.exchange("http://localhost:" + port + "/faculty",
+        facultyForChange.setName("russian language");
+        facultyForChange.setColor("yellow");
+        ResponseEntity<Void> responseChangeFaculty = restTemplate.exchange("http://localhost:" + port + "/faculty",
                 HttpMethod.PUT, new HttpEntity<>(facultyForChange), Void.class);
-        Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        Assertions.assertThat(responseChangeFaculty.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
 
     @Test
     public void whenPutFaculty_thenStatusNotFound() {
         Faculty facultyForChange = new Faculty();
         facultyForChange.setId(1000);
-        facultyForChange.setName("rush");
+        facultyForChange.setName("literature");
         facultyForChange.setColor("black");
-        ResponseEntity response = restTemplate.exchange("http://localhost:" + port + "/faculty",
+        ResponseEntity<Void> response = restTemplate.exchange("http://localhost:" + port + "/faculty",
                 HttpMethod.PUT, new HttpEntity<>(facultyForChange), Void.class);
         Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
 
     @Test
-    void whenDeleteFaculty() throws Exception {
+    public void whenDeleteFaculty() {
         Faculty faculty = new Faculty();
-        faculty.setName("Gryffindor");
-        faculty.setColor("red");
+        faculty.setName("literature");
+        faculty.setColor("black");
 
-        ResponseEntity<Faculty> facultyResponseEntity = restTemplate.postForEntity("http://localhost:" + port + "/faculty", faculty, Faculty.class);
-        Long savedFacultyId = requireNonNull(facultyResponseEntity.getBody()).getId();
+        ResponseEntity<Faculty> responseAddFaculty = restTemplate.postForEntity("http://localhost:" + port + "/faculty", faculty, Faculty.class);
+        long id = requireNonNull(responseAddFaculty.getBody()).getId();
 
-        ResponseEntity<Faculty> findResponse = restTemplate.getForEntity("http://localhost:" + port + "/faculty/" + savedFacultyId, Faculty.class);
-        Assertions.assertThat(findResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+        ResponseEntity<Faculty> responseFindFaculty = restTemplate.getForEntity("http://localhost:" + port + "/faculty/" + id, Faculty.class);
+        Assertions.assertThat(responseFindFaculty.getStatusCode()).isEqualTo(HttpStatus.OK);
 
-        restTemplate.delete("http://localhost:" + port + "/faculty/" + savedFacultyId);
+        restTemplate.delete("http://localhost:" + port + "/faculty/" + id);
 
-        ResponseEntity<String> response = restTemplate.getForEntity("http://localhost:" + port + "/faculty/" + savedFacultyId, String.class);
-        Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        ResponseEntity<String> responseCheckFaculty = restTemplate.getForEntity("http://localhost:" + port + "/faculty/" + id, String.class);
+        Assertions.assertThat(responseCheckFaculty.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
 }
