@@ -5,11 +5,7 @@ import ru.hogwarts.school.exception.NotFoundException;
 import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.repository.FacultyRepository;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.*;
 
 @Service
 public class FacultyServiceImpl implements FacultyService {
@@ -26,14 +22,14 @@ public class FacultyServiceImpl implements FacultyService {
     }
 
     @Override
-    public Faculty findFaculty(long id) {
-        validateId(id);
-        return facultyRepository.findById(id).get();
+    public List<Faculty> getAllFaculties() {
+        return facultyRepository.findAll();
     }
 
     @Override
-    public List<Faculty> getAllFaculties() {
-        return facultyRepository.findAll();
+    public Faculty findFaculty(long id) {
+        validateId(id);
+        return facultyRepository.findById(id).get();
     }
 
     @Override
@@ -44,6 +40,8 @@ public class FacultyServiceImpl implements FacultyService {
 
     @Override
     public Faculty changeFaculty(Faculty faculty) {
+        long id = faculty.getId();
+        validateId(id);
         return facultyRepository.save(faculty);
     }
 
@@ -55,7 +53,8 @@ public class FacultyServiceImpl implements FacultyService {
 
     @Override
     public Faculty findFacultyByColorOrName(String color, String name) {
-       return facultyRepository.findByColorIgnoreCaseOrNameContainsIgnoreCase(color, name);
+        validateNameAndColor(name, color);
+        return facultyRepository.findByColorIgnoreCaseOrNameContainsIgnoreCase(color, name);
     }
 
     private void validateId(long id) {
@@ -65,11 +64,27 @@ public class FacultyServiceImpl implements FacultyService {
     }
 
     private void validateColor(String color) {
-        if (color == null && color.isBlank()) {
+        if (color == null || color.isBlank()) {
             throw new IllegalArgumentException();
         }
         if (facultyRepository.findByColor(color).isEmpty()) {
             throw new NotFoundException("Факультета с цветом - " + color + " не существует");
         }
+    }
+
+    private void validateNameAndColor(String name, String color) {
+        if ((name == null || name.isBlank()) && (color == null || color.isBlank())) {
+            throw new IllegalArgumentException("Ни один из обязательных параметров не задан");
+        }
+        if ((color == null || color.isBlank()) && facultyRepository.findByName(name).isEmpty()) {
+            throw new NotFoundException("Факультета с именем - " + name + " не существует");
+        }
+        if ((name == null || name.isBlank()) && facultyRepository.findByColor(color).isEmpty()) {
+            throw new NotFoundException("Факультета с цветом - " + color + " не существует");
+        }
+        if (facultyRepository.findByName(name).isEmpty() && facultyRepository.findByColor(color).isEmpty()) {
+            throw new NotFoundException("Факультета с цветом - " + color + " и именем " + name + " не существует");
+        }
+
     }
 }
