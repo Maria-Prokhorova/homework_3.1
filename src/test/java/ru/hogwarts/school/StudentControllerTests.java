@@ -153,6 +153,14 @@ public class StudentControllerTests {
     }
 
     @Test
+    public void whenGetQuantityStudents() {
+        int quantity = 11;
+        ResponseEntity<Integer> responseGetStudent = restTemplate.getForEntity("http://localhost:" + port + "/student/quantity-students", Integer.class);
+        Assertions.assertThat(responseGetStudent.getStatusCode()).isEqualTo(HttpStatus.OK);
+        Assertions.assertThat(responseGetStudent.getBody()).isEqualTo(quantity);
+    }
+
+    @Test
     public void whenPutStudent_thenStatusOk() {
         Student studentForAdd = new Student();
         studentForAdd.setName("r3de3dg5gfqdewe");

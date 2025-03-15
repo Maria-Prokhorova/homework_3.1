@@ -2,6 +2,7 @@ package ru.hogwarts.school.service;
 
 import org.apache.tomcat.util.http.fileupload.ByteArrayOutputStream;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -15,12 +16,13 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 
 import static java.nio.file.StandardOpenOption.CREATE_NEW;
 
 @Service
 @Transactional
-public class AvatarServiceImpl implements AvatarService{
+public class AvatarServiceImpl implements AvatarService {
 
     @Value("${path.to.avatars.folder}")
     private String avatarDir;
@@ -33,9 +35,9 @@ public class AvatarServiceImpl implements AvatarService{
         this.studentService = studentService;
     }
 
-   @Override
+    @Override
     public void uploadAvatar(Long studentId, MultipartFile file) throws IOException {
-        Student student = studentService.findStudent(studentId);
+        Student student = studentService.getStudent(studentId);
 
         Path filePath = Path.of(avatarDir, studentId + "." + getExtensionAvatar(file.getOriginalFilename()));
         Files.createDirectories(filePath.getParent());
@@ -62,6 +64,13 @@ public class AvatarServiceImpl implements AvatarService{
     public Avatar findStudentAvatar(Long studentId) {
         return avatarRepository.findByStudentId(studentId).orElse(new Avatar());
     }
+
+    @Override
+    public List<Avatar> getAllAvatars(Integer pageNumber, Integer pageSize) {
+        PageRequest pageRequest = PageRequest.of(pageNumber - 1, pageSize);
+        return avatarRepository.findAll(pageRequest).getContent();
+    }
+
 
     private String getExtensionAvatar(String fileName) {
         return fileName.substring(fileName.lastIndexOf(".") + 1);
