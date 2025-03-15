@@ -75,7 +75,7 @@ public class StudentControllerWebMvcTest {
 
     @Test
     public void whenGetStudentById_thenStatusOk() throws Exception {
-        when(studentService.findStudent(any(Long.class))).thenReturn(student);
+        when(studentService.getStudent(any(Long.class))).thenReturn(student);
 
         ResultActions perform = mockMvc.perform(get("/student/" + student.getId())
                 .accept(MediaType.APPLICATION_JSON));
@@ -87,7 +87,7 @@ public class StudentControllerWebMvcTest {
                 .andExpect(jsonPath("$.age").value(student.getAge()))
                 .andDo(print());
 
-        verify(studentService).findStudent(any(Long.class));
+        verify(studentService).getStudent(any(Long.class));
     }
 
     @Test
@@ -121,7 +121,7 @@ public class StudentControllerWebMvcTest {
 
     @Test
     public void whenGetStudentByAge_thenStatusOk() throws Exception {
-        when(studentService.findStudentsByAgeBetween(any(Integer.class), any(Integer.class))).thenReturn((List<Student>) students);
+        when(studentService.getStudentsByAgeBetween(any(Integer.class), any(Integer.class))).thenReturn((List<Student>) students);
 
         ResultActions perform = mockMvc.perform(get("/student/age-between?min=15&max=30").accept(MediaType.APPLICATION_JSON));
         perform
@@ -130,14 +130,56 @@ public class StudentControllerWebMvcTest {
                 .andExpect(jsonPath("$.length()").value(students.size()))
                 .andDo(print());
 
-        verify(studentService).findStudentsByAgeBetween(any(Integer.class), any(Integer.class));
+        verify(studentService).getStudentsByAgeBetween(any(Integer.class), any(Integer.class));
+    }
+
+    @Test
+    public void whenGetQuantityStudents() throws Exception {
+        when(studentService.qetQuantityStudents()).thenReturn(20);
+
+        ResultActions perform = mockMvc.perform(get("/student/quantity-students").accept(MediaType.APPLICATION_JSON));
+        perform
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(jsonPath("$").exists())
+                .andExpect(jsonPath("$").value(20))
+                .andDo(print());
+
+        verify(studentService).qetQuantityStudents();
+    }
+
+    @Test
+    public void whenGetAverageAgeStudent() throws Exception {
+        when(studentService.getAverageAgeStudent()).thenReturn(20);
+
+        ResultActions perform = mockMvc.perform(get("/student/average-age").accept(MediaType.APPLICATION_JSON));
+        perform
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(jsonPath("$").exists())
+                .andExpect(jsonPath("$").value(20))
+                .andDo(print());
+
+        verify(studentService).getAverageAgeStudent();
+    }
+
+    @Test
+    public void whenGetLastStudents() throws Exception {
+        when(studentService.getLastStudents()).thenReturn((List<Student>) students);
+
+        ResultActions perform = mockMvc.perform(get("/student/last-students").accept(MediaType.APPLICATION_JSON));
+        perform
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(jsonPath("$").exists())
+                .andExpect(jsonPath("$.length()").value(students.size()))
+                .andDo(print());
+
+        verify(studentService).getLastStudents();
     }
 
     @Test
     public void whenGetStudentsByFacultyId_thenStatus() throws Exception {
         Student mockStudent = mock(Student.class);
         when(mockStudent.getFaculty()).thenReturn(faculty);
-        when(studentService.findStudent(any(Long.class))).thenReturn(mockStudent);
+        when(studentService.getStudent(any(Long.class))).thenReturn(mockStudent);
 
         ResultActions perform = mockMvc.perform(get("/student/idStudent-by-faculty?id=1").accept(MediaType.APPLICATION_JSON));
         perform

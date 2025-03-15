@@ -22,7 +22,7 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    public Student findStudent(long id) {
+    public Student getStudent(long id) {
         validateId(id);
         return studentRepository.findById(id).get();
     }
@@ -52,9 +52,24 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    public List<Student> findStudentsByAgeBetween(int minAge, int maxAge) {
+    public List<Student> getStudentsByAgeBetween(int minAge, int maxAge) {
         validateMinMaxAge(minAge, maxAge);
         return studentRepository.findByAgeBetween(minAge, maxAge);
+    }
+
+    @Override
+    public int qetQuantityStudents() {
+        return studentRepository.findQuantityStudents();
+    }
+
+    @Override
+    public int getAverageAgeStudent() {
+        return studentRepository.findAverageAgeStudent();
+    }
+
+    @Override
+    public List<Student> getLastStudents () {
+        return studentRepository.findLastStudents();
     }
 
     private void validateId(long id) {

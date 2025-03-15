@@ -9,7 +9,7 @@ public interface StudentService {
 
     Student addStudent(Student student);
 
-    Student findStudent(long id);
+    Student getStudent(long id);
 
     List<Student> getAllStudents();
 
@@ -19,5 +19,11 @@ public interface StudentService {
 
     List<Student> getStudentsByAge(int age);
 
-    List<Student> findStudentsByAgeBetween(int minAge, int maxAge);
+    List<Student> getStudentsByAgeBetween(int minAge, int maxAge);
+
+    int qetQuantityStudents();
+
+    int getAverageAgeStudent();
+
+    List<Student> getLastStudents();
 }

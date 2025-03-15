@@ -1,5 +1,6 @@
 package ru.hogwarts.school;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -39,11 +40,11 @@ public class StudentServiceImplTests {
 
     @ParameterizedTest
     @MethodSource("provideCorrectQuestionForTests")
-    public void shouldResultMethodWhenFindStudent(Student student, long correctId, long notCorrectId) {
+    public void shouldResultMethodWhenGetStudentByID(Student student, long correctId, long notCorrectId) {
         when(repositoryMock.findById(correctId)).thenReturn(Optional.of(student));
 
-        assertEquals(student, out.findStudent(correctId));
-        assertThrows(NotFoundException.class, () -> out.findStudent(notCorrectId));
+        assertEquals(student, out.getStudent(correctId));
+        assertThrows(NotFoundException.class, () -> out.getStudent(notCorrectId));
     }
 
     @ParameterizedTest
@@ -61,6 +62,30 @@ public class StudentServiceImplTests {
 
         assertEquals(student, out.getStudentsByAge(age));
         assertThrows(NotFoundException.class, () -> out.getStudentsByAge(notCorrectAge));
+    }
+
+    @Test
+    public void shouldResultMethodWhenGetQuantityStudents() {
+        int quantity = 10;
+        when(repositoryMock.findQuantityStudents()).thenReturn(quantity);
+
+        assertEquals(quantity, out.qetQuantityStudents());
+    }
+
+    @Test
+    public void shouldResultMethodWhenGetAverageAgeStudent() {
+        int averageAge = 20;
+        when(repositoryMock.findAverageAgeStudent()).thenReturn(averageAge);
+
+        assertEquals(averageAge, out.getAverageAgeStudent());
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideCorrectQuestionForTests1")
+    public void shouldResultMethodWhenGetLastStudents(ArrayList<Student> student) {
+        when(repositoryMock.findLastStudents()).thenReturn(student);
+
+        assertEquals(student, out.getLastStudents());
     }
 
     @ParameterizedTest
