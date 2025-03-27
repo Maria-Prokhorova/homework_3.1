@@ -57,9 +57,19 @@ public class StudentController {
         return studentService.getAverageAgeStudent();
     }
 
+    @GetMapping ("/average-age-by-Stream")
+    public double getAverageAgeStudentByStream () {
+        return studentService.getAverageAgeStudentByStream();
+    }
+
     @GetMapping ("/last-students")
     public Collection <Student> getLastStudents () {
         return studentService.getLastStudents();
+    }
+
+    @GetMapping ("/name-with-a")
+    public Collection <String> getStudentsNameWithA () {
+        return studentService.getStudentsNameWithA();
     }
 
     @PutMapping()

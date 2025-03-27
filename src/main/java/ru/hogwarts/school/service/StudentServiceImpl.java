@@ -85,7 +85,7 @@ public class StudentServiceImpl implements StudentService {
         return quantityStudents;
     }
 
-    @Override
+   @Override
     public int getAverageAgeStudent() {
         logger.info("Was invoked method for get average age student.");
         int averageAgeStudent = studentRepository.findAverageAgeStudent();
@@ -94,9 +94,34 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
+    public double getAverageAgeStudentByStream() {
+        logger.info("Was invoked method for get average age student find by Stream.");
+        List<Student> students = studentRepository.findAll();
+        double averageAgeStudent = students.stream()
+                .mapToDouble(Student::getAge)
+                .average()
+                .getAsDouble();
+        logger.debug("The average age of a student in the database is {}", averageAgeStudent);
+        return averageAgeStudent;
+    }
+
+    @Override
     public List<Student> getLastStudents() {
         logger.info("Was invoked method for get 5 last students.");
         return studentRepository.findLastStudents();
+    }
+
+    @Override
+    public List<String> getStudentsNameWithA() {
+        logger.info("Was invoked method for get all students who have name with A.");
+        List<Student> students = studentRepository.findAll();
+        List<String> sortStudents = students.stream()
+                .filter(x-> x.getName().toUpperCase().startsWith("A"))
+                .map (Student::getName)
+                .map (String::toUpperCase)
+                .sorted()
+                .toList();
+        return sortStudents;
     }
 
     private void validateId(long id) {
