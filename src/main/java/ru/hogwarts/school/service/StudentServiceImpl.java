@@ -85,7 +85,7 @@ public class StudentServiceImpl implements StudentService {
         return quantityStudents;
     }
 
-   @Override
+    @Override
     public int getAverageAgeStudent() {
         logger.info("Was invoked method for get average age student.");
         int averageAgeStudent = studentRepository.findAverageAgeStudent();
@@ -116,12 +116,68 @@ public class StudentServiceImpl implements StudentService {
         logger.info("Was invoked method for get all students who have name with A.");
         List<Student> students = studentRepository.findAll();
         List<String> sortStudents = students.stream()
-                .filter(x-> x.getName().toUpperCase().startsWith("A"))
-                .map (Student::getName)
-                .map (String::toUpperCase)
+                .filter(x -> x.getName().toUpperCase().startsWith("A"))
+                .map(Student::getName)
+                .map(String::toUpperCase)
                 .sorted()
                 .toList();
         return sortStudents;
+    }
+
+    @Override
+    public void getStudentsPrintParallel() {
+        logger.info("Was invoked method for get all students names in parallel mode.");
+        List<Student> students = studentRepository.findAll();
+
+        System.out.println("Первый студент -" + students.get(0).getName());
+        System.out.println("Второй студент -" + students.get(1).getName());
+
+        new Thread(() -> {
+            try {
+                System.out.println("Третий студент -" + students.get(2).getName());
+                Thread.sleep(300);
+                System.out.println("Четвертый студент -" + students.get(3).getName());
+                Thread.sleep(300);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }).start();
+
+        new Thread(() -> {
+            try {
+                System.out.println("Пятый студент -" + students.get(4).getName());
+                Thread.sleep(300);
+                System.out.println("Шестой студент -" + students.get(5).getName());
+                Thread.sleep(300);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }).start();
+
+    }
+
+    @Override
+    public void getStudentsPrintSynchronized() {
+        logger.info("Was invoked method for get all students names in parallel mode with synchronized.");
+        List<Student> students = studentRepository.findAll();
+
+        printName(students, 0);
+        printName(students, 1);
+
+        new Thread(() -> {
+            printName(students, 2);
+            printName(students, 3);
+        }).start();
+
+        new Thread(() -> {
+            printName(students, 4);
+            printName(students, 5);
+        }).start();
+
+    }
+
+    private synchronized void printName(List<Student> students, int number) {
+        System.out.println(number + " студент -" + students.get(number).getName());
     }
 
     private void validateId(long id) {
