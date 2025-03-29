@@ -30,4 +30,8 @@ public interface StudentService {
     List<Student> getLastStudents();
 
     List<String> getStudentsNameWithA ();
+
+    void getStudentsPrintParallel();
+
+    void getStudentsPrintSynchronized();
 }
