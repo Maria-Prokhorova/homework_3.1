@@ -77,6 +77,16 @@ public class FacultyServiceImpl implements FacultyService {
         return facultyRepository.findByColorIgnoreCaseOrNameContainsIgnoreCase(color, name);
     }
 
+    @Override
+    public String findLongNameFaculty () {
+        List<Faculty> faculty = facultyRepository.findAll();
+        String longNameFaculty = faculty.stream()
+                .map(Faculty::getName)
+                .max(Comparator.comparingInt(String::length))
+                .get();
+        return longNameFaculty;
+    }
+
     private void validateId(long id) {
         if (facultyRepository.findById(id).isEmpty()) {
             logger.error("There is not faculty with id = {}", id);

@@ -25,5 +25,9 @@ public interface StudentService {
 
     int getAverageAgeStudent();
 
+    double getAverageAgeStudentByStream();
+
     List<Student> getLastStudents();
+
+    List<String> getStudentsNameWithA ();
 }

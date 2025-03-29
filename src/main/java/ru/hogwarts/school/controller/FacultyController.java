@@ -48,6 +48,11 @@ public class FacultyController {
         return facultyService.findFaculty(facultyId).getStudents();
     }
 
+    @GetMapping("/long-name-faculty")
+    public String getLongNameFaculty() {
+        return facultyService.findLongNameFaculty ();
+    }
+
     @PutMapping()
     public Faculty changeFaculty(@RequestBody Faculty faculty) {
         return facultyService.changeFaculty(faculty);
