@@ -72,6 +72,16 @@ public class StudentController {
         return studentService.getStudentsNameWithA();
     }
 
+    @GetMapping ("/print-parallel")
+    public void getStudentsPrintParallel () {
+        studentService.getStudentsPrintParallel();
+    }
+
+    @GetMapping ("/print-synchronized")
+    public void getStudentsPrintSynchronized () {
+        studentService.getStudentsPrintSynchronized();
+    }
+
     @PutMapping()
     public Student changeStudent(@RequestBody Student student) {
 
